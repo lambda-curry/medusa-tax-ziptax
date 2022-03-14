@@ -1,4 +1,3 @@
-import { ClaimService, OrderService } from '@medusajs/medusa/dist/services';
 import {
   ITaxService,
   ItemTaxCalculationLine,
@@ -20,28 +19,22 @@ export default class ZipTaxService extends BaseService implements ITaxService {
   static identifier = 'ziptax';
 
   constructor(
-    { logger, claimService, orderService, cachedZipTaxRateRepository },
+    { logger, cachedZipTaxRateRepository },
     { api_key }: ZipTaxPluginOptions
   ) {
     super();
     this.logger = logger;
-    this.orderService = orderService;
-    this.claimService = claimService;
     this.cachedZipTaxRateRepository = cachedZipTaxRateRepository;
     this.client = new ZipTaxClient({
       apiKey: api_key,
     });
+
+    this.logger.info('Creating ZipTax Service');
   }
 
-  logger: Logger;
-  orderService: OrderService;
-  claimService: ClaimService;
-  cachedZipTaxRateRepository: CachedZipTaxRateRepository;
+  private logger: Logger;
+  private cachedZipTaxRateRepository: CachedZipTaxRateRepository;
   private client: ZipTaxClient;
-
-  getIdentifier() {
-    return 'ziptax';
-  }
 
   /**
    * Retrieves the numerical tax lines for a calculation context.
