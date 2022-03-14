@@ -6,22 +6,24 @@ import {
   TaxCalculationContext,
 } from '@medusajs/medusa';
 import { Address } from '@medusajs/medusa';
+import { BaseService } from 'medusa-interfaces';
 import { Logger } from 'winston';
 import { ProviderTaxLine } from '@medusajs/medusa/dist/types/tax-service';
-import { CachedZipTaxRateRepository } from 'repositories/cached-zip-tax-rate';
-import { ZipTaxClient, ZipTaxRate } from 'utils/ziptax';
+import { CachedZipTaxRateRepository } from '../repositories/cached-zip-tax-rate';
+import { ZipTaxClient, ZipTaxRate } from '../utils/ziptax';
 
 export interface ZipTaxPluginOptions {
   api_key: string;
 }
 
-export default class ZipTaxService implements ITaxService {
+export default class ZipTaxService extends BaseService implements ITaxService {
   static identifier = 'ziptax';
 
   constructor(
     { logger, claimService, orderService, cachedZipTaxRateRepository },
     { api_key }: ZipTaxPluginOptions
   ) {
+    super();
     this.logger = logger;
     this.orderService = orderService;
     this.claimService = claimService;

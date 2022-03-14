@@ -1,4 +1,4 @@
-import { CachedZipTaxRate } from 'models/cached-zip-tax-rate';
+import { CachedZipTaxRate } from '../models/cached-zip-tax-rate';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(CachedZipTaxRate)
