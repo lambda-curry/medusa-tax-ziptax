@@ -1,6 +1,6 @@
 {
   "name": "@lambdacurry/medusa-ziptax-plugin",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "description": "A plugin for using tax rates from ziptax",
   "main": "index.js",
   "types": "index.d.ts",
@@ -20,6 +20,7 @@
   "author": "Adrien de Peretti <adrien.deperetti@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "build-and-publish": "yarn build && yarn publish",
     "clean": "./node_modules/.bin/rimraf services/ models/ migrations/ api/ subscribers/ repositories/ utils/ index.js index.map.js",
     "build": "npm run clean && tsc -p tsconfig.json",
     "watch": "tsc --watch",
