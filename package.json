@@ -1,6 +1,6 @@
 {
   "name": "@lambdacurry/medusa-ziptax-plugin",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A plugin for using tax rates from ziptax",
   "main": "index.js",
   "types": "index.d.ts",
