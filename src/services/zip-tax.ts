@@ -1,15 +1,17 @@
 import {
   AbstractTaxService,
+  AdminAuthRes,
   ItemTaxCalculationLine,
   ShippingTaxCalculationLine,
   TaxCalculationContext,
 } from '@medusajs/medusa';
 import { Address } from '@medusajs/medusa';
-import { BaseService } from 'medusa-interfaces';
 import { Logger } from 'winston';
 import { ProviderTaxLine } from '@medusajs/medusa/dist/types/tax-service';
-import { CachedZipTaxRateRepository } from '../repositories/cached-zip-tax-rate';
 import { ZipTaxClient, ZipTaxRate } from '../utils/ziptax';
+import { EntityManager, Repository } from 'typeorm';
+import { CachedZipTaxRate } from '../models/cached-zip-tax-rate';
+import { ulid } from 'ulid';
 
 export interface ZipTaxPluginOptions {
   api_key: string;
@@ -18,22 +20,17 @@ export interface ZipTaxPluginOptions {
 export default class ZipTaxService extends AbstractTaxService {
   static identifier = 'ziptax';
 
-  constructor(
-    { logger, cachedZipTaxRateRepository },
-    { api_key }: ZipTaxPluginOptions
-  ) {
+  constructor(options, { api_key }: ZipTaxPluginOptions) {
     super();
-    this.logger = logger;
-    this.cachedZipTaxRateRepository = cachedZipTaxRateRepository;
+    this.logger = options.logger;
+    this.manager = options.manager;
     this.client = new ZipTaxClient({
       apiKey: api_key,
     });
-
-    this.logger.info('Creating ZipTax Service');
   }
 
   private logger: Logger;
-  private cachedZipTaxRateRepository: CachedZipTaxRateRepository;
+  private manager: EntityManager;
   private client: ZipTaxClient;
 
   /**
@@ -52,14 +49,12 @@ export default class ZipTaxService extends AbstractTaxService {
     if (!shipping_address) return [];
 
     const address = this.buildAddressString(shipping_address);
-    this.logger.info(`ZipTax Address String: ${address}`);
 
     const zipTaxRate = await this.fetchTaxRate(address);
-    this.logger.info(`ZipTax Address String: ${JSON.stringify(zipTaxRate)}`);
 
     if (!zipTaxRate) return [];
 
-    const taxRate = zipTaxRate.taxUse;
+    const taxRate = zipTaxRate.taxUse * 100;
 
     return [
       ...itemLines.map(line => ({
@@ -82,7 +77,12 @@ export default class ZipTaxService extends AbstractTaxService {
   }
 
   private async fetchTaxRate(address: string): Promise<ZipTaxRate> {
-    const cachedZipTaxRates = await this.cachedZipTaxRateRepository.find({
+    this.logger.debug(`Fetching Tax Rate for ${address}`);
+
+    const repository: Repository<CachedZipTaxRate> =
+      this.manager.getRepository(CachedZipTaxRate);
+
+    const cachedZipTaxRates = await repository.find({
       where: { address },
       order: { updated_at: 'DESC' },
     });
@@ -97,7 +97,8 @@ export default class ZipTaxService extends AbstractTaxService {
 
     if (!rate) return rate;
 
-    await this.cachedZipTaxRateRepository.insert({
+    await repository.insert({
+      id: 'ztax_' + ulid(),
       tax_data: rate as any,
       address,
     });
