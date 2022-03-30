@@ -1,5 +1,5 @@
 import {
-  ITaxService,
+  AbstractTaxService,
   ItemTaxCalculationLine,
   ShippingTaxCalculationLine,
   TaxCalculationContext,
@@ -15,7 +15,7 @@ export interface ZipTaxPluginOptions {
   api_key: string;
 }
 
-export default class ZipTaxService extends BaseService implements ITaxService {
+export default class ZipTaxService extends AbstractTaxService {
   static identifier = 'ziptax';
 
   constructor(
