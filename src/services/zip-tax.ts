@@ -1,6 +1,5 @@
 import {
   AbstractTaxService,
-  AdminAuthRes,
   ItemTaxCalculationLine,
   ShippingTaxCalculationLine,
   TaxCalculationContext,
@@ -57,13 +56,13 @@ export default class ZipTaxService extends AbstractTaxService {
     const taxRate = zipTaxRate.taxUse * 100;
 
     return [
-      ...itemLines.map(line => ({
+      ...itemLines.map((line) => ({
         rate: taxRate,
         name: 'Sales Tax',
         code: null,
         item_id: line.item.id,
       })),
-      ...shippingLines.map(line => ({
+      ...shippingLines.map((line) => ({
         rate: taxRate,
         name: 'Sales Tax',
         code: null,
@@ -73,7 +72,16 @@ export default class ZipTaxService extends AbstractTaxService {
   }
 
   private buildAddressString(address: Address) {
-    return `${address.address_1} ${address.address_2}, ${address.city} ${address.province}, ${address.postal_code}`;
+    return Object.entries(address).reduce((prev, [key, value], index) => {
+      if (!value) return `${prev}`;
+      if (index === 0) return `${value}`;
+
+      const text = ['city', 'country_code'].includes(key)
+        ? `, ${value}`
+        : ` ${value}`;
+
+      return `${prev}${text}`;
+    }, ``);
   }
 
   private async fetchTaxRate(address: string): Promise<ZipTaxRate> {
