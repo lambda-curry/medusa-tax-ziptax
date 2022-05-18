@@ -72,16 +72,20 @@ export default class ZipTaxService extends AbstractTaxService {
   }
 
   private buildAddressString(address: Address) {
-    return Object.entries(address).reduce((prev, [key, value], index) => {
-      if (!value) return `${prev}`;
-      if (index === 0) return `${value}`;
+    return Object.entries(address).reduce(
+      (prev, [key, value], index, array) => {
+        if (index === array.length - 1) return `${prev}${value}`;
 
-      const text = ['city', 'country_code'].includes(key)
-        ? `, ${value}`
-        : ` ${value}`;
+        const text = value ?? '';
+        const addSpace = !!array[index + 1][1] ? ' ' : '';
+        const addComma = ['city', 'country_code'].includes(array[index + 1][0])
+          ? ','
+          : '';
 
-      return `${prev}${text}`;
-    }, ``);
+        return `${prev}${text}${addComma}${addSpace}`;
+      },
+      ``
+    );
   }
 
   private async fetchTaxRate(address: string): Promise<ZipTaxRate> {
