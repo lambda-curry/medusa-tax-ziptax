@@ -74,7 +74,9 @@ export default class ZipTaxService extends AbstractTaxService {
   private buildAddressString(address: Address) {
     return Object.entries(address).reduce(
       (prev, [key, value], index, array) => {
-        if (index === array.length - 1) return `${prev}${value}`;
+        const isLast = index === array.length - 1;
+
+        if (isLast) return `${prev}${value}`;
 
         const text = value ?? '';
         const addSpace = !!array[index + 1][1] ? ' ' : '';
