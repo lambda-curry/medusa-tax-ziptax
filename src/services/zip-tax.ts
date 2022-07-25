@@ -56,16 +56,16 @@ export default class ZipTaxService extends AbstractTaxService {
     const taxRate = zipTaxRate.taxUse * 100;
 
     return [
-      ...itemLines.map((line) => ({
+      ...itemLines.map(line => ({
         rate: taxRate,
         name: 'Sales Tax',
-        code: null,
+        code: 'ziptax_calculated_sales_tax',
         item_id: line.item.id,
       })),
-      ...shippingLines.map((line) => ({
+      ...shippingLines.map(line => ({
         rate: taxRate,
         name: 'Sales Tax',
-        code: null,
+        code: 'ziptax_calculated_sales_tax',
         shipping_method_id: line.shipping_method.id,
       })),
     ];
